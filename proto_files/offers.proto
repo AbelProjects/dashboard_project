@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+message Offers {
+  repeated Offer offer = 1;
+}
+
+message Offer {
+  optional string name = 2;
+  optional float price_before = 4;
+  optional float price_after = 5;
+  optional float amount = 8;
+  optional string amount_unit = 9;
+  optional float discount = 10;
+  optional string discount_condition = 12 [default='-'];
+  optional string start_date = 15;
+  optional string end_date = 16;
+}
