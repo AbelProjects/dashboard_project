@@ -7,6 +7,7 @@ from typing import List
 import pickle
 from tqdm import tqdm
 import numpy as np
+import os
 
 
 def get_url(city, shop, page_num):
@@ -67,15 +68,21 @@ def parse_shop(city: str = 'moskva', shop: str = '5ka', page_range: int = 100, s
 
 
 def parse_shop_list(city: str, shop_list: List[str], page_range=100):
-    shop_dict = {}
+    data = []
     for shop in tqdm(shop_list):
-        shop_dict[shop] = parse_shop(city=city, shop=shop, page_range=page_range)
-    return shop_dict
+        shop_data = parse_shop(city=city, shop=shop, page_range=page_range)
+        data.extend(shop_data)
+    return data
+
+
+def save_results(data):
+    now_date = datetime.date.today().strftime('%Y_%m_%d')
+    with open(f'data/prices_{now_date}.pickle', 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':
     shop_list = ['5ka', 'magnit-univer', 'perekrestok', 'dixy',
                  'lenta-super', 'vkusvill_offline', 'mgnl', 'azbuka_vkusa']
     data = parse_shop_list(city='moskva', shop_list=shop_list, page_range=100)
-    with open('prices.pickle', 'wb') as handle:
-        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    save_results(data)
