@@ -7,6 +7,7 @@ from typing import List
 import pickle
 from tqdm import tqdm
 import numpy as np
+import pandas as pd
 import os
 
 
@@ -57,6 +58,7 @@ def parse_shop(city: str = 'moskva', shop: str = '5ka', page_range: int = 100, s
                 print(f'No more products in {shop}')
             else:
                 print(f'No data for {shop}')
+            shop_data = pd.DataFrame(shop_data)
             return shop_data
         else:
             if skip_errors:
@@ -64,21 +66,21 @@ def parse_shop(city: str = 'moskva', shop: str = '5ka', page_range: int = 100, s
                 return shop_data
             else:
                 raise ValueError(f'Unexpected code {code} for {shop}')
+    shop_data = pd.DataFrame(shop_data)
     return shop_data
 
 
 def parse_shop_list(city: str, shop_list: List[str], page_range=100):
-    data = []
+    data = pd.DataFrame()
     for shop in tqdm(shop_list):
         shop_data = parse_shop(city=city, shop=shop, page_range=page_range)
-        data.extend(shop_data)
+        data = pd.concat([data, shop_data])
     return data
 
 
 def save_results(data):
     now_date = datetime.date.today().strftime('%Y_%m_%d')
-    with open(f'data/prices_{now_date}.pickle', 'wb') as handle:
-        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    data.to_csv(f'data/prices_{now_date}.csv', index=False)
 
 
 if __name__ == '__main__':
